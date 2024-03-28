@@ -8,7 +8,7 @@ function Body() {
     const appRouter=createBrowserRouter([
         {
             path:"/",
-            element:<Login/>
+            element:<Login/>  // here by mistake <body/>  the to it was giving router inside router error
         },{
             path:"/browse",
             element:<Browse/>
