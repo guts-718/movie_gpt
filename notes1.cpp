@@ -25,5 +25,10 @@ npm install -D react-router-dom
 onSubmit={(e)=>{e.preventDefault()}} aisa form tag ke andar kara jata hai
 onClick={func()} --> () krne se infinite loop me phas jaenge
 
+- to create redux library -> we install 2 toolkits
+  1. npm i -D @reduxjs/toolkit
+  2. npm i react-redux
 
+
+-- for redux --> create appStore.js in utils and config the redux there, then create various slices in the same utils directory and then wrap the App.js with preovider store={}
 */

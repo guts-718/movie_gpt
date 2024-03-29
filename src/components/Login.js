@@ -11,27 +11,31 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth } from "../utils/Firebase";
-//import { useDispatch } from "react-redux";
-//import { addUser } from "../utils/userSlice";
+import { useNavigate } from "react-router-dom";
+import { dispatch} from "@reduxjs/toolkit";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/UserSlice";
 import { BG_URL} from "../utils/constants";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
+  const navigate = useNavigate();
   // const dispatch = useDispatch();
+
 
   const name = useRef(null);
   const email = useRef(null);
   const password = useRef(null);
 
-  const handleButtonClick = () => {
+  const handleButtonClick = async() => {
     const message = checkValidData(email.current.value, password.current.value);
     setErrorMessage(message);
     if (message) return;
 
     if (!isSignInForm) {
       // Sign Up Logic
-      createUserWithEmailAndPassword(
+      await createUserWithEmailAndPassword(
         auth,
         email.current.value,
         password.current.value
@@ -39,24 +43,26 @@ const Login = () => {
         .then((userCredential) => {
           const user = userCredential.user;
           console.log(user);
-          // updateProfile(user, {
-          //   displayName: name.current.value,
-          //   photoURL: USER_AVATAR,
-          // })
-          //   .then(() => {
-          //     const { uid, email, displayName, photoURL } = auth.currentUser;
-          //     dispatch(
-          //       addUser({
-          //         uid: uid,
-          //         email: email,
-          //         displayName: displayName,
-          //         photoURL: photoURL,
-          //       })
-          //     );
-          //   })
-          //   .catch((error) => {
-          //     setErrorMessage(error.message);
-          //   });
+          updateProfile(user, {
+            displayName: name.current.value,
+           //photoURL: USER_AVATAR,
+          })
+            .then(() => {
+              const { uid, email, displayName, photoURL } = auth.currentUser; // to get the updated value if we had used user then it would have used the previous value which we dont want
+              dispatch(
+                addUser({
+                  uid: uid,
+                  email: email,
+                  displayName: displayName,
+                  photoURL: photoURL,
+                })
+              );
+          navigate("/browse")
+
+            })
+            .catch((error) => {
+              setErrorMessage(error.message);
+            });
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -65,7 +71,7 @@ const Login = () => {
         });
     } else {
       // Sign In Logic
-      signInWithEmailAndPassword(
+      await signInWithEmailAndPassword(
         auth,
         email.current.value,
         password.current.value
@@ -73,6 +79,7 @@ const Login = () => {
         .then((userCredential) => {
           // Signed in
           const user = userCredential.user;
+          navigate("/browse")
         })
         .catch((error) => {
           const errorCode = error.code;
