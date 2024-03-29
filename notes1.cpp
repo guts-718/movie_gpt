@@ -31,4 +31,14 @@ onClick={func()} --> () krne se infinite loop me phas jaenge
 
 
 -- for redux --> create appStore.js in utils and config the redux there, then create various slices in the same utils directory and then wrap the App.js with preovider store={}
+
+- if the user is logged in redirect him to the browse page
+- if the user is not logged in make sure he cannot access the browse route - it should re route it back to the login page
+- what we have to do is to check for auth in the browse route also
+- sara routing we are doing inside header as it is always present and moreover it is inside our route provider,, earlier we were trying to do so from the body but we failed
+
+
+
+
+
 */

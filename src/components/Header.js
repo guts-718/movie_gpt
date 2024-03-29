@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../utils/Firebase";
+import { addUser,removeUser } from '../utils/userSlice';
+
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -16,7 +18,23 @@ const Header = () => {
         navigate("/error");
       });
   };
+  useEffect(()=>{
+    onAuthStateChanged(auth,(user) => {
+    if (user) {
+        
+        const {uid, email, displayName} = user;
+        dispatch(addUser({uid:uid, email:email, displayName:displayName}));
+        navigate("/browse");
+        // ...
+    } else {
+        dispatch(removeUser());
+        navigate("/")
+        // User is signed out
+        // ...
+    }
+});
 
+    },[])
 
 
   return(
