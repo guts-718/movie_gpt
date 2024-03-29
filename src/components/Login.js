@@ -1,23 +1,89 @@
-import Header from "./Header";
-import { useState, useRef } from "react";
-import Validate from "../utils/Validate";
 // doing onClick={toggleLogin()} causes havoc infinite rendering
+// const [name] = useRef(null); -- doing this causes an error --> useRef is not an iterable
+
+
+import { useState, useRef } from "react";
+import Header from "./Header";
+import  checkValidData  from "../utils/Validate";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { auth } from "../utils/Firebase";
+//import { useDispatch } from "react-redux";
+//import { addUser } from "../utils/userSlice";
+import { BG_URL} from "../utils/constants";
+
 const Login = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const [isError, setIsError] = useState(null);
-  // const [name] = useRef(null); -- doing this causes an error --> useRef is not an iterable
+  const [isSignInForm, setIsSignInForm] = useState(true);
+  const [errorMessage, setErrorMessage] = useState(null);
+  // const dispatch = useDispatch();
+
   const name = useRef(null);
   const email = useRef(null);
   const password = useRef(null);
 
-  const validate_login = () => {
-    const res = Validate(email.current.value, password.current.value);
-    setIsError(res);
-    return res;
+  const handleButtonClick = () => {
+    const message = checkValidData(email.current.value, password.current.value);
+    setErrorMessage(message);
+    if (message) return;
+
+    if (!isSignInForm) {
+      // Sign Up Logic
+      createUserWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log(user);
+          // updateProfile(user, {
+          //   displayName: name.current.value,
+          //   photoURL: USER_AVATAR,
+          // })
+          //   .then(() => {
+          //     const { uid, email, displayName, photoURL } = auth.currentUser;
+          //     dispatch(
+          //       addUser({
+          //         uid: uid,
+          //         email: email,
+          //         displayName: displayName,
+          //         photoURL: photoURL,
+          //       })
+          //     );
+          //   })
+          //   .catch((error) => {
+          //     setErrorMessage(error.message);
+          //   });
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(errorCode + "-" + errorMessage);
+        });
+    } else {
+      // Sign In Logic
+      signInWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(errorCode + "-" + errorMessage);
+        });
+    }
   };
 
-  const toggleLogin = () => {
-    setIsLoggedIn(!isLoggedIn);
+  const toggleSignInForm = () => {
+    setIsSignInForm(!isSignInForm);
   };
   return (
     <div className="flex">
@@ -26,47 +92,49 @@ const Login = () => {
         alt="netflix-img"
         src="https://assets.nflxext.com/ffe/siteui/vlv3/9d3533b2-0e2b-40b2-95e0-ecd7979cc88b/a3873901-5b7c-46eb-b9fa-12fea5197bd3/IN-en-20240311-popsignuptwoweeks-perspective_alpha_website_small.jpg"
       />
-      <form onSubmit={(e)=>{e.preventDefault()}} className="absolute bg-black w-3/12 p-12 my-36 mx-auto space-y-3 right-0 left-0 text-white rounded-lg">
-        <h1 className="text-3xl font-bold py-4">
-          {isLoggedIn ? "Sign in" : "Register"}
+      <form
+        onSubmit={(e) => e.preventDefault()}
+        className="w-full md:w-3/12 absolute p-12 bg-black my-36 mx-auto right-0 left-0 text-white rounded-lg bg-opacity-80"
+      >
+        <h1 className="font-bold text-3xl py-4">
+          {isSignInForm ? "Sign In" : "Sign Up"}
         </h1>
-        {!isLoggedIn && (
+
+        {!isSignInForm && (
           <input
-            type="text"
             ref={name}
+            type="text"
             placeholder="Full Name"
-            className="p-4 my-4 bg-gray-800 rounded-lg w-full"
-          ></input>
+            className="p-4 my-4 w-full bg-gray-700"
+          />
         )}
         <input
-          type="text"
           ref={email}
-          placeholder="Email"
-          className="p-4 my-4 bg-gray-800 rounded-lg w-full"
-        ></input>
+          type="text"
+          placeholder="Email Address"
+          className="p-4 my-4 w-full bg-gray-700"
+        />
         <input
-          type="password"
           ref={password}
+          type="password"
           placeholder="Password"
-          className="p-4 my-4 bg-gray-800 rounded-lg w-full"
-        ></input>
-        {isError && <h1 className="text-xl font-bold py-4">{isError}</h1>}
+          className="p-4 my-4 w-full bg-gray-700"
+        />
+        <p className="text-red-500 font-bold text-lg py-2">{errorMessage}</p>
         <button
-          className="bg-white text-red-700 w-full rounded-lg p-4 my-6"
-          onClick={validate_login}
+          className="p-4 my-6 bg-red-700 w-full rounded-lg"
+          onClick={handleButtonClick}
         >
-          {isLoggedIn ? "Sign Up" : "Log in"}
+          {isSignInForm ? "Sign In" : "Sign Up"}
         </button>
-        
-        <span
-          className="cursor-pointer text-Xxl font-bold"
-          onClick={toggleLogin}
-        >
-          {isLoggedIn ? "New to netflix?Sign Up" : "Already Registered? LogIn"}
-        </span>
+        <p className="py-4 cursor-pointer" onClick={toggleSignInForm}>
+          {isSignInForm
+            ? "New to Netflix? Sign Up Now"
+            : "Already registered? Sign In Now."}
+        </p>
       </form>
     </div>
   );
 };
-
 export default Login;
+
