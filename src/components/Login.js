@@ -11,14 +11,14 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth } from "../utils/Firebase";
-import { dispatch} from "@reduxjs/toolkit";
+import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
-  // const dispatch = useDispatch();
+  const dispatch =  useDispatch();
 
 
   const name = useRef(null);

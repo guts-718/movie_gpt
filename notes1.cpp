@@ -1,5 +1,5 @@
 /*
-
+- inside jsx we always have to use camelcasing
 - CREATE REACT APP
 - TAILWIND CSS
 - IN SRC ->> COMPONENTS AND UTILS
