@@ -1,3 +1,5 @@
+// goes to SecondaryContainer.js
+// <MovieList title={"Horror"} movies={movies.nowPlayingMovies} />
 import MovieCard from "./MovieCard";
 
 const MovieList = ({ title, movies }) => {

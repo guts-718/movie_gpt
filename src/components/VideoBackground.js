@@ -1,3 +1,4 @@
+// goes to MainContainer.js
 import React from 'react'
 import { useSelector } from 'react-redux'
 import useMovieTrailer from '../hooks/useMovieTrailer'
